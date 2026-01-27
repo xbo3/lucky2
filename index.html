@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LUCKY VIKY - PREMIUM CASINO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* 배경 동영상 */
+        .video-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .video-bg video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+        }
+        
+        /* 파티클 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            font-size: 20px;
+            animation: float 15s infinite;
+            opacity: 0.6;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+        
+        /* 컨테이너 */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* 헤더 */
+        .header {
+            text-align: center;
+            padding: 30px 0;
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: 900;
+            color: #22c55e;
+            text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+        }
+        
+        .logo span {
+            color: #fff;
+        }
+        
+        .subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 3px;
+            margin-top: 5px;
+        }
+        
+        /* 메인 배너 이미지 */
+        .banner-image {
+            width: 100%;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        /* 이벤트 카드 */
+        .event-card {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .event-card::before {
+            content: '🎉';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+        }
+        
+        .event-card::after {
+            content: '🎊';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+        }
+        
+        .event-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .event-title {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 16px;
+        }
+        
+        .event-btn {
+            display: inline-block;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .event-btn:hover {
+            background: rgba(0,0,0,0.5);
+            transform: scale(1.05);
+        }
+        
+        /* 혜택 카드 */
+        .benefit-card {
+            background: rgba(30, 30, 30, 0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .benefit-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fbbf24;
+            margin-bottom: 20px;
+        }
+        
+        .benefit-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .benefit-item {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            padding: 16px 40px;
+            font-size: 24px;
+            font-weight: 900;
+        }
+        
+        .benefit-plus {
+            font-size: 24px;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .benefit-note {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 16px;
+        }
+        
+        /* 안내 섹션 */
+        .info-section {
+            margin-bottom: 20px;
+        }
+        
+        .info-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-box {
+            background: rgba(30, 30, 30, 0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .info-box strong {
+            color: #22c55e;
+        }
+        
+        .info-box .highlight {
+            color: #fbbf24;
+        }
+        
+        /* 기프티콘 리스트 */
+        .gift-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .gift-item {
+            background: rgba(30, 30, 30, 0.9);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s;
+        }
+        
+        .gift-item:hover {
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+        
+        .gift-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .gift-info {
+            flex: 1;
+        }
+        
+        .gift-name {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .gift-price {
+            font-size: 14px;
+            color: #22c55e;
+        }
+        
+        /* CTA 버튼 */
+        .cta-btn {
+            display: block;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            text-align: center;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            margin: 30px 0;
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+            transition: all 0.3s;
+        }
+        
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(34, 197, 94, 0.5);
+        }
+        
+        /* 경고 */
+        .warning {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        /* 푸터 */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .footer a {
+            color: #22c55e;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 배경 동영상 -->
+    <div class="video-bg" id="video-bg">
+        <video autoplay muted loop playsinline id="bg-video">
+            <source src="" type="video/mp4">
+        </video>
+        <div class="video-overlay" id="video-overlay"></div>
+    </div>
+    
+    <!-- 파티클 -->
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <!-- 헤더 -->
+        <div class="header">
+            <div class="logo" id="logo">LUCKY <span>VIKY</span></div>
+            <div class="subtitle">PREMIUM CASINO</div>
+        </div>
+        
+        <!-- 메인 배너 이미지 -->
+        <img class="banner-image" id="banner-image" src="" alt="이벤트 배너" style="display:none;">
+        
+        <!-- 이벤트 카드 -->
+        <div class="event-card">
+            <div class="event-badge" id="event-badge">🎂 3rd ANNIVERSARY</div>
+            <div class="event-title" id="event-title">누구나 20 + 15</div>
+            <a href="#" class="event-btn" id="event-btn">🎰 슬롯 전용 보너스</a>
+        </div>
+        
+        <!-- 혜택 카드 -->
+        <div class="benefit-card">
+            <div class="benefit-title" id="benefit-title">💰 200,000원 입금시 3주년 혜택</div>
+            <div class="benefit-box">
+                <div class="benefit-item" id="benefit-1">100,000P</div>
+                <div class="benefit-plus">+</div>
+                <div class="benefit-item" id="benefit-2">기프티콘 50,000원</div>
+            </div>
+            <div class="benefit-note" id="benefit-note">* 슬롯 게임 전용 보너스</div>
+        </div>
+        
+        <!-- 기프티콘 수령방법 -->
+        <div class="info-section">
+            <div class="info-title">🎁 기프티콘 수령방법</div>
+            <div class="info-box" id="info-box">
+                당사 <strong>고객센터</strong> 또는 <strong>공식 텔레그램</strong>으로<br>
+                지급받으실 기프티콘 종류와 연락처 남겨주시면<br>
+                <span class="highlight">당일 순차적으로 발송</span>됩니다.
+            </div>
+        </div>
+        
+        <!-- 기프티콘 종류 -->
+        <div class="info-section">
+            <div class="info-title">🏷️ 기프티콘 종류</div>
+            <div class="gift-list" id="gift-list">
+                <div class="gift-item">
+                    <div class="gift-icon">🏪</div>
+                    <div class="gift-info">
+                        <div class="gift-name">CU 편의점 기프트</div>
+                        <div class="gift-price">50,000원</div>
+                    </div>
+                </div>
+                <div class="gift-item">
+                    <div class="gift-icon">🛵</div>
+                    <div class="gift-info">
+                        <div class="gift-name">배달의민족</div>
+                        <div class="gift-price">50,000원</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CTA 버튼 -->
+        <a href="https://KK-02.COM" class="cta-btn" id="cta-btn">🎉 3주년 기념 보너스 지금 참여하기</a>
+        
+        <!-- 경고 -->
+        <div class="warning" id="warning">
+            ⚠️ 본 이벤트는 1인 1회 참여 가능하며, 부정 참여 시 보너스가 회수될 수 있습니다.
+        </div>
+        
+        <!-- 푸터 -->
+        <div class="footer">
+            © 2024 Lucky Viky. All rights reserved.<br>
+            문의: <a href="https://t.me/BIPLAYS" id="contact-link">@BIPLAYS</a>
+        </div>
+    </div>
+    
+    <script>
+        // 파티클 생성
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const emojis = ['🎁', '✨', '⭐', '🎉', '🎊', '💰', '🎰'];
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        
+        // 사이트 데이터 로드
+        async function loadSiteData() {
+            try {
+                const response = await fetch('/api/site');
+                const data = await response.json();
+                renderSite(data);
+            } catch (error) {
+                console.log('기본 데이터 사용');
+            }
+        }
+        
+        // 사이트 렌더링
+        function renderSite(data) {
+            // 배경 동영상
+            if (data.bgVideo) {
+                document.getElementById('bg-video').src = data.bgVideo;
+            }
+            
+            // 배경 오버레이
+            if (data.bgOverlay !== undefined) {
+                document.getElementById('video-overlay').style.background = `rgba(0,0,0,${data.bgOverlay})`;
+            }
+            
+            // 로고
+            if (data.logo) {
+                document.getElementById('logo').innerHTML = data.logo;
+            }
+            
+            // 배너 이미지
+            if (data.bannerImage) {
+                const bannerImg = document.getElementById('banner-image');
+                bannerImg.src = data.bannerImage;
+                bannerImg.style.display = 'block';
+            }
+            
+            // 이벤트 카드
+            if (data.eventBadge) document.getElementById('event-badge').textContent = data.eventBadge;
+            if (data.eventTitle) document.getElementById('event-title').textContent = data.eventTitle;
+            if (data.eventBtnText) document.getElementById('event-btn').textContent = data.eventBtnText;
+            if (data.eventBtnLink) document.getElementById('event-btn').href = data.eventBtnLink;
+            
+            // 혜택 카드
+            if (data.benefitTitle) document.getElementById('benefit-title').textContent = data.benefitTitle;
+            if (data.benefit1) document.getElementById('benefit-1').textContent = data.benefit1;
+            if (data.benefit2) document.getElementById('benefit-2').textContent = data.benefit2;
+            if (data.benefitNote) document.getElementById('benefit-note').textContent = data.benefitNote;
+            
+            // CTA 버튼
+            if (data.ctaBtnText) document.getElementById('cta-btn').textContent = data.ctaBtnText;
+            if (data.ctaBtnLink) document.getElementById('cta-btn').href = data.ctaBtnLink;
+            
+            // 문의 링크
+            if (data.contactLink) {
+                document.getElementById('contact-link').href = data.contactLink;
+                document.getElementById('contact-link').textContent = data.contactText || '@BIPLAYS';
+            }
+        }
+        
+        // 어드민에서 실시간 업데이트 수신
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'updateSite') {
+                renderSite(event.data.data);
+            }
+        });
+        
+        // 초기화
+        createParticles();
+        loadSiteData();
+    </script>
+</body>
+</html>

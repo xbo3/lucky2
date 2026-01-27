@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Viky Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+        }
+        
+        .admin-container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* 사이드바 */
+        .sidebar {
+            width: 400px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #22c55e;
+        }
+        
+        .save-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .save-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 섹션 */
+        .section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fbbf24;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 6px;
+            display: block;
+        }
+        
+        .form-input {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #22c55e;
+        }
+        
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .file-upload {
+            background: rgba(0,0,0,0.3);
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+        
+        .file-upload:hover {
+            border-color: #22c55e;
+        }
+        
+        .file-upload-text {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* 미리보기 */
+        .preview {
+            flex: 1;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .preview-frame {
+            width: 375px;
+            height: 812px;
+            border: 8px solid #333;
+            border-radius: 40px;
+            overflow: hidden;
+            background: #000;
+        }
+        
+        .preview-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* 이미지 미리보기 */
+        .img-preview {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">🍀 Lucky Viky Admin</div>
+                <button class="save-btn" onclick="saveSite()">💾 저장</button>
+            </div>
+            
+            <!-- 기본 설정 -->
+            <div class="section">
+                <div class="section-title">⚙️ 기본 설정</div>
+                <label class="form-label">로고 텍스트 (HTML)</label>
+                <input type="text" class="form-input" id="logo" value="LUCKY <span>VIKY</span>" oninput="updatePreview()">
+                
+                <label class="form-label">배경 동영상 URL</label>
+                <input type="text" class="form-input" id="bgVideo" placeholder="동영상 URL" oninput="updatePreview()">
+                
+                <label class="form-label">배경 어둡기 (0~1)</label>
+                <input type="range" class="form-input" id="bgOverlay" min="0" max="1" step="0.1" value="0.6" oninput="updatePreview()">
+            </div>
+            
+            <!-- 배너 이미지 -->
+            <div class="section">
+                <div class="section-title">🖼️ 배너 이미지</div>
+                <div class="file-upload" onclick="document.getElementById('bannerImageFile').click()">
+                    <input type="file" id="bannerImageFile" accept="image/*" onchange="handleBannerImage(this)" style="display:none;">
+                    <div class="file-upload-text">클릭하여 배너 이미지 업로드</div>
+                </div>
+                <div id="bannerImagePreview"></div>
+            </div>
+            
+            <!-- 이벤트 카드 -->
+            <div class="section">
+                <div class="section-title">🎉 이벤트 카드</div>
+                <label class="form-label">배지 텍스트</label>
+                <input type="text" class="form-input" id="eventBadge" value="🎂 3rd ANNIVERSARY" oninput="updatePreview()">
+                
+                <label class="form-label">메인 제목</label>
+                <input type="text" class="form-input" id="eventTitle" value="누구나 20 + 15" oninput="updatePreview()">
+                
+                <label class="form-label">버튼 텍스트</label>
+                <input type="text" class="form-input" id="eventBtnText" value="🎰 슬롯 전용 보너스" oninput="updatePreview()">
+                
+                <label class="form-label">버튼 링크</label>
+                <input type="text" class="form-input" id="eventBtnLink" placeholder="https://..." oninput="updatePreview()">
+            </div>
+            
+            <!-- 혜택 카드 -->
+            <div class="section">
+                <div class="section-title">💰 혜택 카드</div>
+                <label class="form-label">제목</label>
+                <input type="text" class="form-input" id="benefitTitle" value="💰 200,000원 입금시 3주년 혜택" oninput="updatePreview()">
+                
+                <label class="form-label">혜택 1</label>
+                <input type="text" class="form-input" id="benefit1" value="100,000P" oninput="updatePreview()">
+                
+                <label class="form-label">혜택 2</label>
+                <input type="text" class="form-input" id="benefit2" value="기프티콘 50,000원" oninput="updatePreview()">
+                
+                <label class="form-label">하단 안내</label>
+                <input type="text" class="form-input" id="benefitNote" value="* 슬롯 게임 전용 보너스" oninput="updatePreview()">
+            </div>
+            
+            <!-- CTA 버튼 -->
+            <div class="section">
+                <div class="section-title">🔘 메인 버튼 (CTA)</div>
+                <label class="form-label">버튼 텍스트</label>
+                <input type="text" class="form-input" id="ctaBtnText" value="🎉 3주년 기념 보너스 지금 참여하기" oninput="updatePreview()">
+                
+                <label class="form-label">연결 링크 ⭐</label>
+                <input type="text" class="form-input" id="ctaBtnLink" value="https://KK-02.COM" oninput="updatePreview()">
+            </div>
+            
+            <!-- 문의 -->
+            <div class="section">
+                <div class="section-title">📞 문의</div>
+                <label class="form-label">텔레그램 링크</label>
+                <input type="text" class="form-input" id="contactLink" value="https://t.me/BIPLAYS" oninput="updatePreview()">
+                
+                <label class="form-label">표시 텍스트</label>
+                <input type="text" class="form-input" id="contactText" value="@BIPLAYS" oninput="updatePreview()">
+            </div>
+        </div>
+        
+        <div class="preview">
+            <div class="preview-frame">
+                <iframe id="preview-frame" src="index.html"></iframe>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let siteData = {
+            logo: 'LUCKY <span>VIKY</span>',
+            bgVideo: '',
+            bgOverlay: 0.6,
+            bannerImage: '',
+            eventBadge: '🎂 3rd ANNIVERSARY',
+            eventTitle: '누구나 20 + 15',
+            eventBtnText: '🎰 슬롯 전용 보너스',
+            eventBtnLink: '',
+            benefitTitle: '💰 200,000원 입금시 3주년 혜택',
+            benefit1: '100,000P',
+            benefit2: '기프티콘 50,000원',
+            benefitNote: '* 슬롯 게임 전용 보너스',
+            ctaBtnText: '🎉 3주년 기념 보너스 지금 참여하기',
+            ctaBtnLink: 'https://KK-02.COM',
+            contactLink: 'https://t.me/BIPLAYS',
+            contactText: '@BIPLAYS'
+        };
+        
+        // 초기화
+        async function init() {
+            try {
+                const response = await fetch('/api/site');
+                const data = await response.json();
+                siteData = { ...siteData, ...data };
+                loadDataToForm();
+            } catch (error) {
+                console.log('기본 데이터 사용');
+            }
+        }
+        
+        // 폼에 데이터 로드
+        function loadDataToForm() {
+            document.getElementById('logo').value = siteData.logo || '';
+            document.getElementById('bgVideo').value = siteData.bgVideo || '';
+            document.getElementById('bgOverlay').value = siteData.bgOverlay || 0.6;
+            document.getElementById('eventBadge').value = siteData.eventBadge || '';
+            document.getElementById('eventTitle').value = siteData.eventTitle || '';
+            document.getElementById('eventBtnText').value = siteData.eventBtnText || '';
+            document.getElementById('eventBtnLink').value = siteData.eventBtnLink || '';
+            document.getElementById('benefitTitle').value = siteData.benefitTitle || '';
+            document.getElementById('benefit1').value = siteData.benefit1 || '';
+            document.getElementById('benefit2').value = siteData.benefit2 || '';
+            document.getElementById('benefitNote').value = siteData.benefitNote || '';
+            document.getElementById('ctaBtnText').value = siteData.ctaBtnText || '';
+            document.getElementById('ctaBtnLink').value = siteData.ctaBtnLink || '';
+            document.getElementById('contactLink').value = siteData.contactLink || '';
+            document.getElementById('contactText').value = siteData.contactText || '';
+            
+            if (siteData.bannerImage) {
+                document.getElementById('bannerImagePreview').innerHTML = 
+                    `<img src="${siteData.bannerImage}" class="img-preview">`;
+            }
+            
+            updatePreview();
+        }
+        
+        // 미리보기 업데이트
+        function updatePreview() {
+            siteData.logo = document.getElementById('logo').value;
+            siteData.bgVideo = document.getElementById('bgVideo').value;
+            siteData.bgOverlay = parseFloat(document.getElementById('bgOverlay').value);
+            siteData.eventBadge = document.getElementById('eventBadge').value;
+            siteData.eventTitle = document.getElementById('eventTitle').value;
+            siteData.eventBtnText = document.getElementById('eventBtnText').value;
+            siteData.eventBtnLink = document.getElementById('eventBtnLink').value;
+            siteData.benefitTitle = document.getElementById('benefitTitle').value;
+            siteData.benefit1 = document.getElementById('benefit1').value;
+            siteData.benefit2 = document.getElementById('benefit2').value;
+            siteData.benefitNote = document.getElementById('benefitNote').value;
+            siteData.ctaBtnText = document.getElementById('ctaBtnText').value;
+            siteData.ctaBtnLink = document.getElementById('ctaBtnLink').value;
+            siteData.contactLink = document.getElementById('contactLink').value;
+            siteData.contactText = document.getElementById('contactText').value;
+            
+            const iframe = document.getElementById('preview-frame');
+            if (iframe.contentWindow) {
+                iframe.contentWindow.postMessage({
+                    type: 'updateSite',
+                    data: siteData
+                }, '*');
+            }
+        }
+        
+        // 배너 이미지 업로드
+        function handleBannerImage(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    siteData.bannerImage = e.target.result;
+                    document.getElementById('bannerImagePreview').innerHTML = 
+                        `<img src="${e.target.result}" class="img-preview">`;
+                    updatePreview();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // 저장
+        async function saveSite() {
+            try {
+                const response = await fetch('/api/site', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(siteData)
+                });
+                
+                if (response.ok) {
+                    alert('✅ 저장 완료!');
+                } else {
+                    alert('❌ 저장 실패');
+                }
+            } catch (error) {
+                alert('❌ 저장 실패: ' + error.message);
+            }
+        }
+        
+        init();
+    </script>
+</body>
+</html>
