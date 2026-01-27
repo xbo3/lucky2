@@ -85,7 +85,7 @@
         .container {
             max-width: 500px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px 20px 20px;
             position: relative;
             z-index: 10;
         }
@@ -93,14 +93,19 @@
         /* 헤더 */
         .header {
             text-align: center;
-            padding: 20px 0;
+            padding: 0;
+            overflow: hidden;
         }
         
         .header-video {
             width: 100%;
-            max-width: 400px;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            max-width: 500px;
+            height: 60px;
+            object-fit: cover;
+            object-position: center;
+            border-radius: 0;
+            display: block;
+            margin: 0 auto;
         }
         
         .logo {
@@ -125,7 +130,7 @@
         .banner-video {
             width: 100%;
             border-radius: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
         
@@ -135,7 +140,7 @@
             border-radius: 16px;
             padding: 24px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             position: relative;
             overflow: hidden;
         }
@@ -195,7 +200,7 @@
             border-radius: 16px;
             padding: 24px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         
         .benefit-title {
@@ -254,7 +259,7 @@
         
         /* 안내 섹션 */
         .info-section {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         
         .info-title {
@@ -343,7 +348,7 @@
             font-size: 18px;
             font-weight: 700;
             text-decoration: none;
-            margin: 30px 0;
+            margin: 15px 0;
             box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
             transition: all 0.3s;
         }
@@ -416,6 +421,9 @@
             </div>
             <div class="benefit-note" id="benefit-note">* 슬롯 게임 전용 보너스</div>
         </div>
+        
+        <!-- CTA 버튼 (상단) -->
+        <a href="https://KK-32.COM" class="cta-btn" id="cta-btn-top">🎉 지금 참여하기</a>
         
         <!-- 기프티콘 수령방법 -->
         <div class="info-section">
@@ -533,7 +541,10 @@
             
             // CTA 버튼
             if (data.ctaBtnText) document.getElementById('cta-btn').textContent = data.ctaBtnText;
-            if (data.ctaBtnLink) document.getElementById('cta-btn').href = data.ctaBtnLink;
+            if (data.ctaBtnLink) {
+                document.getElementById('cta-btn').href = data.ctaBtnLink;
+                document.getElementById('cta-btn-top').href = data.ctaBtnLink;
+            }
             
             // 문의 링크
             if (data.contactLink) {
@@ -565,6 +576,7 @@
         
         // CTA 버튼 클릭 이벤트
         document.getElementById('cta-btn').addEventListener('click', trackClick);
+        document.getElementById('cta-btn-top').addEventListener('click', trackClick);
         document.getElementById('event-btn').addEventListener('click', trackClick);
         
         // 초기화
