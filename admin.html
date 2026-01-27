@@ -170,6 +170,34 @@
                 <button class="save-btn" onclick="saveSite()">💾 저장</button>
             </div>
             
+            <!-- 📊 트래픽 통계 -->
+            <div class="section" style="background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(22,163,74,0.1));">
+                <div class="section-title">📊 트래픽 통계</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div style="background:rgba(0,0,0,0.3);padding:16px;border-radius:12px;text-align:center;">
+                        <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:4px;">오늘 방문</div>
+                        <div style="font-size:28px;font-weight:900;color:#22c55e;" id="todayVisits">0</div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.3);padding:16px;border-radius:12px;text-align:center;">
+                        <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:4px;">전체 방문</div>
+                        <div style="font-size:28px;font-weight:900;color:#fbbf24;" id="totalVisits">0</div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.3);padding:16px;border-radius:12px;text-align:center;">
+                        <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:4px;">오늘 클릭</div>
+                        <div style="font-size:28px;font-weight:900;color:#ec4899;" id="todayClicks">0</div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.3);padding:16px;border-radius:12px;text-align:center;">
+                        <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:4px;">전체 클릭</div>
+                        <div style="font-size:28px;font-weight:900;color:#8b5cf6;" id="totalClicks">0</div>
+                    </div>
+                </div>
+                <div style="margin-top:12px;display:flex;gap:8px;">
+                    <button onclick="loadStats()" style="flex:1;background:rgba(255,255,255,0.1);border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-size:12px;">🔄 새로고침</button>
+                    <button onclick="resetStats()" style="flex:1;background:rgba(239,68,68,0.2);border:none;color:#ef4444;padding:10px;border-radius:8px;cursor:pointer;font-size:12px;">🗑️ 리셋</button>
+                </div>
+                <div id="statsHistory" style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.5);"></div>
+            </div>
+            
             <!-- 기본 설정 -->
             <div class="section">
                 <div class="section-title">⚙️ 기본 설정</div>
@@ -202,6 +230,9 @@
                 <label class="form-label">메인 제목</label>
                 <input type="text" class="form-input" id="eventTitle" value="누구나 20 + 15" oninput="updatePreview()">
                 
+                <label class="form-label">제목 크기 (<span id="eventTitleSizeVal">32</span>px)</label>
+                <input type="range" class="form-input" id="eventTitleSize" min="20" max="60" value="32" oninput="updatePreview(); document.getElementById('eventTitleSizeVal').textContent=this.value;">
+                
                 <label class="form-label">버튼 텍스트</label>
                 <input type="text" class="form-input" id="eventBtnText" value="🎰 슬롯 전용 보너스" oninput="updatePreview()">
                 
@@ -215,11 +246,17 @@
                 <label class="form-label">제목</label>
                 <input type="text" class="form-input" id="benefitTitle" value="💰 200,000원 입금시 3주년 혜택" oninput="updatePreview()">
                 
+                <label class="form-label">제목 크기 (<span id="benefitTitleSizeVal">18</span>px)</label>
+                <input type="range" class="form-input" id="benefitTitleSize" min="14" max="30" value="18" oninput="updatePreview(); document.getElementById('benefitTitleSizeVal').textContent=this.value;">
+                
                 <label class="form-label">혜택 1</label>
                 <input type="text" class="form-input" id="benefit1" value="100,000P" oninput="updatePreview()">
                 
                 <label class="form-label">혜택 2</label>
                 <input type="text" class="form-input" id="benefit2" value="기프티콘 50,000원" oninput="updatePreview()">
+                
+                <label class="form-label">혜택 글자 크기 (<span id="benefitItemSizeVal">24</span>px)</label>
+                <input type="range" class="form-input" id="benefitItemSize" min="16" max="40" value="24" oninput="updatePreview(); document.getElementById('benefitItemSizeVal').textContent=this.value;">
                 
                 <label class="form-label">하단 안내</label>
                 <input type="text" class="form-input" id="benefitNote" value="* 슬롯 게임 전용 보너스" oninput="updatePreview()">
@@ -232,7 +269,7 @@
                 <input type="text" class="form-input" id="ctaBtnText" value="🎉 3주년 기념 보너스 지금 참여하기" oninput="updatePreview()">
                 
                 <label class="form-label">연결 링크 ⭐</label>
-                <input type="text" class="form-input" id="ctaBtnLink" value="https://KK-02.COM" oninput="updatePreview()">
+                <input type="text" class="form-input" id="ctaBtnLink" value="https://KK-32.COM" oninput="updatePreview()">
             </div>
             
             <!-- 문의 -->
@@ -261,14 +298,17 @@
             bannerImage: '',
             eventBadge: '🎂 3rd ANNIVERSARY',
             eventTitle: '누구나 20 + 15',
+            eventTitleSize: 32,
             eventBtnText: '🎰 슬롯 전용 보너스',
             eventBtnLink: '',
             benefitTitle: '💰 200,000원 입금시 3주년 혜택',
+            benefitTitleSize: 18,
             benefit1: '100,000P',
             benefit2: '기프티콘 50,000원',
+            benefitItemSize: 24,
             benefitNote: '* 슬롯 게임 전용 보너스',
             ctaBtnText: '🎉 3주년 기념 보너스 지금 참여하기',
-            ctaBtnLink: 'https://KK-02.COM',
+            ctaBtnLink: 'https://KK-32.COM',
             contactLink: 'https://t.me/BIPLAYS',
             contactText: '@BIPLAYS'
         };
@@ -292,11 +332,17 @@
             document.getElementById('bgOverlay').value = siteData.bgOverlay || 0.6;
             document.getElementById('eventBadge').value = siteData.eventBadge || '';
             document.getElementById('eventTitle').value = siteData.eventTitle || '';
+            document.getElementById('eventTitleSize').value = siteData.eventTitleSize || 32;
+            document.getElementById('eventTitleSizeVal').textContent = siteData.eventTitleSize || 32;
             document.getElementById('eventBtnText').value = siteData.eventBtnText || '';
             document.getElementById('eventBtnLink').value = siteData.eventBtnLink || '';
             document.getElementById('benefitTitle').value = siteData.benefitTitle || '';
+            document.getElementById('benefitTitleSize').value = siteData.benefitTitleSize || 18;
+            document.getElementById('benefitTitleSizeVal').textContent = siteData.benefitTitleSize || 18;
             document.getElementById('benefit1').value = siteData.benefit1 || '';
             document.getElementById('benefit2').value = siteData.benefit2 || '';
+            document.getElementById('benefitItemSize').value = siteData.benefitItemSize || 24;
+            document.getElementById('benefitItemSizeVal').textContent = siteData.benefitItemSize || 24;
             document.getElementById('benefitNote').value = siteData.benefitNote || '';
             document.getElementById('ctaBtnText').value = siteData.ctaBtnText || '';
             document.getElementById('ctaBtnLink').value = siteData.ctaBtnLink || '';
@@ -318,11 +364,14 @@
             siteData.bgOverlay = parseFloat(document.getElementById('bgOverlay').value);
             siteData.eventBadge = document.getElementById('eventBadge').value;
             siteData.eventTitle = document.getElementById('eventTitle').value;
+            siteData.eventTitleSize = parseInt(document.getElementById('eventTitleSize').value);
             siteData.eventBtnText = document.getElementById('eventBtnText').value;
             siteData.eventBtnLink = document.getElementById('eventBtnLink').value;
             siteData.benefitTitle = document.getElementById('benefitTitle').value;
+            siteData.benefitTitleSize = parseInt(document.getElementById('benefitTitleSize').value);
             siteData.benefit1 = document.getElementById('benefit1').value;
             siteData.benefit2 = document.getElementById('benefit2').value;
+            siteData.benefitItemSize = parseInt(document.getElementById('benefitItemSize').value);
             siteData.benefitNote = document.getElementById('benefitNote').value;
             siteData.ctaBtnText = document.getElementById('ctaBtnText').value;
             siteData.ctaBtnLink = document.getElementById('ctaBtnLink').value;
@@ -372,7 +421,51 @@
             }
         }
         
+        // 통계 로드
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+                
+                document.getElementById('todayVisits').textContent = stats.todayVisits || 0;
+                document.getElementById('totalVisits').textContent = stats.totalVisits || 0;
+                document.getElementById('todayClicks').textContent = stats.todayCtaClicks || 0;
+                document.getElementById('totalClicks').textContent = stats.ctaClicks || 0;
+                
+                // 히스토리 표시
+                if (stats.visitHistory && stats.visitHistory.length > 0) {
+                    const recent = stats.visitHistory.slice(-7).reverse();
+                    const historyHtml = recent.map(h => 
+                        `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <span>${h.date}</span>
+                            <span>방문 ${h.visits} / 클릭 ${h.clicks}</span>
+                        </div>`
+                    ).join('');
+                    document.getElementById('statsHistory').innerHTML = '<div style="margin-top:8px;font-weight:700;">최근 7일</div>' + historyHtml;
+                }
+            } catch (error) {
+                console.log('통계 로드 실패');
+            }
+        }
+        
+        // 통계 리셋
+        async function resetStats() {
+            if (confirm('정말 통계를 리셋하시겠습니까?')) {
+                try {
+                    await fetch('/api/stats/reset', { method: 'POST' });
+                    loadStats();
+                    alert('✅ 통계 리셋 완료');
+                } catch (error) {
+                    alert('❌ 리셋 실패');
+                }
+            }
+        }
+        
         init();
+        loadStats();
+        
+        // 30초마다 통계 자동 새로고침
+        setInterval(loadStats, 30000);
     </script>
 </body>
 </html>

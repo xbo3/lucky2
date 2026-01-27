@@ -198,11 +198,31 @@
         
         .benefit-item {
             background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            border: 2px solid rgba(34, 197, 94, 0.5);
             border-radius: 12px;
             padding: 16px 40px;
             font-size: 24px;
             font-weight: 900;
+            animation: neonPulse 1.5s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+        }
+        
+        @keyframes neonPulse {
+            0%, 100% {
+                border-color: rgba(34, 197, 94, 0.5);
+                box-shadow: 0 0 20px rgba(34, 197, 94, 0.3),
+                            0 0 40px rgba(34, 197, 94, 0.2),
+                            inset 0 0 20px rgba(34, 197, 94, 0.1);
+                background: linear-gradient(135deg, #1a1a2e, #16213e);
+            }
+            50% {
+                border-color: rgba(34, 197, 94, 1);
+                box-shadow: 0 0 30px rgba(34, 197, 94, 0.6),
+                            0 0 60px rgba(34, 197, 94, 0.4),
+                            0 0 100px rgba(34, 197, 94, 0.2),
+                            inset 0 0 30px rgba(34, 197, 94, 0.2);
+                background: linear-gradient(135deg, #1e3a2f, #1a3050);
+            }
         }
         
         .benefit-plus {
@@ -363,7 +383,7 @@
         </div>
         
         <!-- 메인 배너 이미지 -->
-        <img class="banner-image" id="banner-image" src="" alt="이벤트 배너" style="display:none;">
+        <img class="banner-image" id="banner-image" src="cards.png" alt="이벤트 배너">
         
         <!-- 이벤트 카드 -->
         <div class="event-card">
@@ -415,7 +435,7 @@
         </div>
         
         <!-- CTA 버튼 -->
-        <a href="https://KK-02.COM" class="cta-btn" id="cta-btn">🎉 3주년 기념 보너스 지금 참여하기</a>
+        <a href="https://KK-32.COM" class="cta-btn" id="cta-btn">🎉 3주년 기념 보너스 지금 참여하기</a>
         
         <!-- 경고 -->
         <div class="warning" id="warning">
@@ -476,21 +496,25 @@
             
             // 배너 이미지
             if (data.bannerImage) {
-                const bannerImg = document.getElementById('banner-image');
-                bannerImg.src = data.bannerImage;
-                bannerImg.style.display = 'block';
+                document.getElementById('banner-image').src = data.bannerImage;
             }
             
             // 이벤트 카드
             if (data.eventBadge) document.getElementById('event-badge').textContent = data.eventBadge;
             if (data.eventTitle) document.getElementById('event-title').textContent = data.eventTitle;
+            if (data.eventTitleSize) document.getElementById('event-title').style.fontSize = data.eventTitleSize + 'px';
             if (data.eventBtnText) document.getElementById('event-btn').textContent = data.eventBtnText;
             if (data.eventBtnLink) document.getElementById('event-btn').href = data.eventBtnLink;
             
             // 혜택 카드
             if (data.benefitTitle) document.getElementById('benefit-title').textContent = data.benefitTitle;
+            if (data.benefitTitleSize) document.getElementById('benefit-title').style.fontSize = data.benefitTitleSize + 'px';
             if (data.benefit1) document.getElementById('benefit-1').textContent = data.benefit1;
             if (data.benefit2) document.getElementById('benefit-2').textContent = data.benefit2;
+            if (data.benefitItemSize) {
+                document.getElementById('benefit-1').style.fontSize = data.benefitItemSize + 'px';
+                document.getElementById('benefit-2').style.fontSize = data.benefitItemSize + 'px';
+            }
             if (data.benefitNote) document.getElementById('benefit-note').textContent = data.benefitNote;
             
             // CTA 버튼
@@ -511,9 +535,28 @@
             }
         });
         
+        // 방문 기록
+        async function trackVisit() {
+            try {
+                await fetch('/api/visit', { method: 'POST' });
+            } catch (e) {}
+        }
+        
+        // CTA 클릭 기록
+        async function trackClick() {
+            try {
+                await fetch('/api/click', { method: 'POST' });
+            } catch (e) {}
+        }
+        
+        // CTA 버튼 클릭 이벤트
+        document.getElementById('cta-btn').addEventListener('click', trackClick);
+        document.getElementById('event-btn').addEventListener('click', trackClick);
+        
         // 초기화
         createParticles();
         loadSiteData();
+        trackVisit();
     </script>
 </body>
 </html>
