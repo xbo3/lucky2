@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LUCKY VIKY - PREMIUM CASINO</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8KKV5TTW2S"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8KKV5TTW2S');
+    </script>
     <style>
         * {
             margin: 0;
@@ -84,7 +93,14 @@
         /* 헤더 */
         .header {
             text-align: center;
-            padding: 30px 0;
+            padding: 20px 0;
+        }
+        
+        .header-video {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
         
         .logo {
@@ -105,8 +121,8 @@
             margin-top: 5px;
         }
         
-        /* 메인 배너 이미지 */
-        .banner-image {
+        /* 메인 배너 동영상 */
+        .banner-video {
             width: 100%;
             border-radius: 16px;
             margin-bottom: 20px;
@@ -376,14 +392,12 @@
     <div class="particles" id="particles"></div>
     
     <div class="container">
-        <!-- 헤더 -->
+        <!-- 헤더 (동영상) -->
         <div class="header">
-            <div class="logo" id="logo">LUCKY <span>VIKY</span></div>
-            <div class="subtitle">PREMIUM CASINO</div>
+            <video class="header-video" id="header-video" autoplay muted loop playsinline>
+                <source src="banner.mp4" type="video/mp4">
+            </video>
         </div>
-        
-        <!-- 메인 배너 이미지 -->
-        <img class="banner-image" id="banner-image" src="cards.png" alt="이벤트 배너">
         
         <!-- 이벤트 카드 -->
         <div class="event-card">
@@ -494,9 +508,9 @@
                 document.getElementById('logo').innerHTML = data.logo;
             }
             
-            // 배너 이미지
-            if (data.bannerImage) {
-                document.getElementById('banner-image').src = data.bannerImage;
+            // 배너 동영상
+            if (data.bannerVideo) {
+                document.getElementById('banner-video').src = data.bannerVideo;
             }
             
             // 이벤트 카드
