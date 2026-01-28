@@ -39,7 +39,9 @@ const defaultData = {
     contactLink: 'https://t.me/BIPLAYS',
     contactText: '@BIPLAYS',
     // 멀티 이벤트 카드 (MELBET, Lucky Wheel 등)
-    events: []
+    events: [],
+    // 동적 섹션 (배너/버튼 추가 가능)
+    sections: []
 };
 
 // 기본 통계

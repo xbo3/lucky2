@@ -333,6 +333,47 @@
                 <label class="form-label">표시 텍스트</label>
                 <input type="text" class="form-input" id="contactText" value="@BIPLAYS" oninput="updatePreview()">
             </div>
+            
+            <!-- 동적 섹션 관리 -->
+            <div class="section" style="background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(37,99,235,0.1));">
+                <div class="section-title">📋 동적 섹션 관리</div>
+                <div id="sectionsContainer"></div>
+                <button onclick="addNewSection()" style="width:100%;margin-top:8px;background:rgba(59,130,246,0.3);border:none;color:#60a5fa;padding:10px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;">＋ 섹션 추가</button>
+                
+                <!-- 섹션 편집 모달 -->
+                <div id="sectionEditor" style="margin-top:12px;display:none;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;">
+                    <div style="font-size:13px;font-weight:700;margin-bottom:8px;" id="sectionEditorTitle">섹션 추가</div>
+                    
+                    <label class="form-label">섹션 제목</label>
+                    <input type="text" class="form-input" id="secTitleInput" placeholder="예: 파트너 추천">
+                    
+                    <div id="sectionItemsContainer" style="margin-top:12px;"></div>
+                    <button onclick="addItemToSection()" style="width:100%;margin-top:8px;background:rgba(34,197,94,0.2);border:none;color:#22c55e;padding:8px;border-radius:8px;cursor:pointer;font-size:12px;">＋ 배너/버튼 추가</button>
+                    
+                    <div style="display:flex;gap:8px;margin-top:12px;">
+                        <button onclick="saveSectionEdit()" style="flex:1;background:#3b82f6;border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;">저장</button>
+                        <button onclick="cancelSectionEdit()" style="flex:1;background:rgba(255,255,255,0.08);border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-size:13px;">취소</button>
+                    </div>
+                </div>
+                
+                <!-- 아이템 편집 모달 -->
+                <div id="itemEditor" style="margin-top:12px;display:none;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;">
+                    <div style="font-size:13px;font-weight:700;margin-bottom:8px;" id="itemEditorTitle">아이템 편집</div>
+                    
+                    <label class="form-label">타입</label>
+                    <select class="form-input" id="itemTypeInput" onchange="updateItemEditorType()">
+                        <option value="banner">배너</option>
+                        <option value="button">버튼</option>
+                    </select>
+                    
+                    <div id="itemEditorContent"></div>
+                    
+                    <div style="display:flex;gap:8px;margin-top:12px;">
+                        <button onclick="saveItemEdit()" style="flex:1;background:#22c55e;border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;">저장</button>
+                        <button onclick="cancelItemEdit()" style="flex:1;background:rgba(255,255,255,0.08);border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-size:13px;">취소</button>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="preview">
@@ -346,6 +387,8 @@
         let currentDomain = 'default';
         let siteIndex = { maxSites: 10, sites: [] };
         let editingEventIndex = -1; // -1이면 새 이벤트
+        let editingSectionIndex = -1; // -1이면 새 섹션
+        let editingItemIndex = -1; // -1이면 새 아이템, 아니면 섹션 내 아이템 인덱스
         let siteData = {
             logo: 'LUCKY <span>VIKY</span>',
             bgVideo: '',
@@ -366,7 +409,8 @@
             ctaBtnLink: 'https://KK-32.COM',
             contactLink: 'https://t.me/BIPLAYS',
             contactText: '@BIPLAYS',
-            events: []
+            events: [],
+            sections: []
         };
         
         // ================== 사이트(도메인) 관리 ==================
@@ -494,6 +538,11 @@
                 siteData.events = [];
             }
             renderEventsList();
+            // 동적 섹션 리스트
+            if (!Array.isArray(siteData.sections)) {
+                siteData.sections = [];
+            }
+            renderSectionsList();
             
             if (siteData.bannerVideo) {
                 document.getElementById('bannerVideoPreview').innerHTML = 
@@ -629,6 +678,7 @@
             siteData.ctaBtnLink = document.getElementById('ctaBtnLink').value;
             siteData.contactLink = document.getElementById('contactLink').value;
             siteData.contactText = document.getElementById('contactText').value;
+            // sections는 renderSectionsList에서 이미 siteData에 반영됨
             
             const iframe = document.getElementById('preview-frame');
             if (iframe.contentWindow) {
@@ -663,6 +713,253 @@
                     `<video src="${url}" class="img-preview" autoplay muted loop playsinline></video>`;
             }
             updatePreview();
+        }
+        
+        // ================== 동적 섹션 관리 ==================
+        function renderSectionsList() {
+            const container = document.getElementById('sectionsContainer');
+            if (!container) return;
+            
+            if (!siteData.sections || siteData.sections.length === 0) {
+                container.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.5);">등록된 섹션이 없습니다. ＋ 버튼을 눌러 추가하세요.</div>';
+                return;
+            }
+            
+            container.innerHTML = siteData.sections.map((sec, idx) => {
+                const itemCount = (sec.items || []).length;
+                return `
+                    <div style="position:relative;background:rgba(15,23,42,0.6);border-radius:10px;padding:10px 36px 10px 10px;margin-bottom:8px;border:1px solid rgba(59,130,246,0.3);">
+                        <div style="font-size:13px;font-weight:700;color:#60a5fa;">${sec.title || '섹션 ' + (idx + 1)}</div>
+                        <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;">아이템 ${itemCount}개</div>
+                        <div style="position:absolute;top:6px;right:6px;display:flex;gap:4px;">
+                            <button onclick="editSection(${idx})" title="수정" style="background:rgba(15,23,42,0.9);border:none;color:#e5e7eb;width:22px;height:22px;border-radius:999px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">✏️</button>
+                            <button onclick="deleteSection(${idx})" title="삭제" style="background:rgba(127,29,29,0.9);border:none;color:#fee2e2;width:22px;height:22px;border-radius:999px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function addNewSection() {
+            editingSectionIndex = -1;
+            document.getElementById('sectionEditorTitle').textContent = '섹션 추가';
+            document.getElementById('secTitleInput').value = '';
+            document.getElementById('sectionItemsContainer').innerHTML = '';
+            document.getElementById('sectionEditor').style.display = 'block';
+        }
+        
+        function editSection(index) {
+            if (!siteData.sections || !siteData.sections[index]) return;
+            const sec = siteData.sections[index];
+            editingSectionIndex = index;
+            document.getElementById('sectionEditorTitle').textContent = '섹션 수정';
+            document.getElementById('secTitleInput').value = sec.title || '';
+            renderSectionItems(sec.items || []);
+            document.getElementById('sectionEditor').style.display = 'block';
+        }
+        
+        function deleteSection(index) {
+            if (!siteData.sections || !siteData.sections[index]) return;
+            if (!confirm('이 섹션을 삭제하시겠습니까?')) return;
+            siteData.sections.splice(index, 1);
+            renderSectionsList();
+            updatePreview();
+        }
+        
+        function renderSectionItems(items) {
+            const container = document.getElementById('sectionItemsContainer');
+            if (!container) return;
+            
+            if (!items || items.length === 0) {
+                container.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:8px;">아이템이 없습니다.</div>';
+                return;
+            }
+            
+            container.innerHTML = items.map((item, idx) => {
+                const typeLabel = item.type === 'banner' ? '배너' : '버튼';
+                const preview = item.type === 'banner' 
+                    ? (item.image ? `<img src="${item.image}" style="max-width:100%;max-height:60px;border-radius:4px;">` : '이미지 없음')
+                    : (item.text || '텍스트 없음');
+                return `
+                    <div style="position:relative;background:rgba(0,0,0,0.3);border-radius:8px;padding:8px 32px 8px 8px;margin-bottom:6px;border:1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size:11px;font-weight:700;color:#22c55e;">${typeLabel}</div>
+                        <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-top:2px;">${preview}</div>
+                        <div style="position:absolute;top:4px;right:4px;display:flex;gap:2px;">
+                            <button onclick="editItemInSection(${idx})" style="background:rgba(15,23,42,0.9);border:none;color:#e5e7eb;width:20px;height:20px;border-radius:999px;cursor:pointer;font-size:10px;">✏️</button>
+                            <button onclick="deleteItemFromSection(${idx})" style="background:rgba(127,29,29,0.9);border:none;color:#fee2e2;width:20px;height:20px;border-radius:999px;cursor:pointer;font-size:10px;">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function addItemToSection() {
+            editingItemIndex = -1;
+            document.getElementById('itemEditorTitle').textContent = '아이템 추가';
+            document.getElementById('itemTypeInput').value = 'banner';
+            updateItemEditorType();
+            document.getElementById('itemEditor').style.display = 'block';
+        }
+        
+        function editItemInSection(itemIndex) {
+            if (editingSectionIndex === -1) return;
+            const sec = siteData.sections[editingSectionIndex];
+            if (!sec.items || !sec.items[itemIndex]) return;
+            const item = sec.items[itemIndex];
+            editingItemIndex = itemIndex;
+            document.getElementById('itemEditorTitle').textContent = '아이템 수정';
+            document.getElementById('itemTypeInput').value = item.type || 'banner';
+            updateItemEditorType();
+            loadItemData(item);
+            document.getElementById('itemEditor').style.display = 'block';
+        }
+        
+        function deleteItemFromSection(itemIndex) {
+            if (editingSectionIndex === -1) return;
+            const sec = siteData.sections[editingSectionIndex];
+            if (!sec.items || !sec.items[itemIndex]) return;
+            if (!confirm('이 아이템을 삭제하시겠습니까?')) return;
+            sec.items.splice(itemIndex, 1);
+            renderSectionItems(sec.items);
+            updatePreview();
+        }
+        
+        function updateItemEditorType() {
+            const type = document.getElementById('itemTypeInput').value;
+            const content = document.getElementById('itemEditorContent');
+            if (type === 'banner') {
+                content.innerHTML = `
+                    <label class="form-label">이미지 URL</label>
+                    <input type="text" class="form-input" id="itemImageInput" placeholder="https://...">
+                    <label class="form-label">높이 (px)</label>
+                    <input type="number" class="form-input" id="itemHeightInput" placeholder="200" value="200">
+                    <label class="form-label">너비 (예: 100%, 300px)</label>
+                    <input type="text" class="form-input" id="itemWidthInput" placeholder="100%" value="100%">
+                    <label class="form-label">링크 URL (선택)</label>
+                    <input type="text" class="form-input" id="itemLinkInput" placeholder="https://...">
+                `;
+            } else {
+                content.innerHTML = `
+                    <label class="form-label">버튼 텍스트</label>
+                    <input type="text" class="form-input" id="itemTextInput" placeholder="버튼 텍스트">
+                    <label class="form-label">높이 (px)</label>
+                    <input type="number" class="form-input" id="itemHeightInput" placeholder="60" value="60">
+                    <label class="form-label">너비 (예: 100%, 200px)</label>
+                    <input type="text" class="form-input" id="itemWidthInput" placeholder="100%" value="100%">
+                    <label class="form-label">배경색 (CSS 컬러값)</label>
+                    <input type="text" class="form-input" id="itemBgColorInput" placeholder="linear-gradient(135deg,#22c55e,#16a34a)">
+                    <label class="form-label">텍스트 색상</label>
+                    <input type="text" class="form-input" id="itemTextColorInput" placeholder="#fff" value="#fff">
+                    <label class="form-label">링크 URL</label>
+                    <input type="text" class="form-input" id="itemLinkInput" placeholder="https://...">
+                    <label class="form-label">글자 크기 (px)</label>
+                    <input type="number" class="form-input" id="itemFontSizeInput" placeholder="16" value="16">
+                `;
+            }
+        }
+        
+        function loadItemData(item) {
+            if (item.type === 'banner') {
+                document.getElementById('itemImageInput').value = item.image || '';
+                document.getElementById('itemHeightInput').value = item.height || 200;
+                document.getElementById('itemWidthInput').value = item.width || '100%';
+                document.getElementById('itemLinkInput').value = item.link || '';
+            } else {
+                document.getElementById('itemTextInput').value = item.text || '';
+                document.getElementById('itemHeightInput').value = item.height || 60;
+                document.getElementById('itemWidthInput').value = item.width || '100%';
+                document.getElementById('itemBgColorInput').value = item.bgColor || '';
+                document.getElementById('itemTextColorInput').value = item.textColor || '#fff';
+                document.getElementById('itemLinkInput').value = item.link || '';
+                document.getElementById('itemFontSizeInput').value = item.fontSize || 16;
+            }
+        }
+        
+        function saveItemEdit() {
+            const type = document.getElementById('itemTypeInput').value;
+            let item = { type };
+            
+            if (type === 'banner') {
+                item.image = document.getElementById('itemImageInput').value.trim();
+                item.height = parseInt(document.getElementById('itemHeightInput').value) || 200;
+                item.width = document.getElementById('itemWidthInput').value.trim() || '100%';
+                item.link = document.getElementById('itemLinkInput').value.trim();
+                if (!item.image) {
+                    alert('이미지 URL은 필수입니다.');
+                    return;
+                }
+            } else {
+                item.text = document.getElementById('itemTextInput').value.trim();
+                item.height = parseInt(document.getElementById('itemHeightInput').value) || 60;
+                item.width = document.getElementById('itemWidthInput').value.trim() || '100%';
+                item.bgColor = document.getElementById('itemBgColorInput').value.trim();
+                item.textColor = document.getElementById('itemTextColorInput').value.trim() || '#fff';
+                item.link = document.getElementById('itemLinkInput').value.trim();
+                item.fontSize = parseInt(document.getElementById('itemFontSizeInput').value) || 16;
+                if (!item.text) {
+                    alert('버튼 텍스트는 필수입니다.');
+                    return;
+                }
+            }
+            
+            if (editingSectionIndex === -1) {
+                alert('먼저 섹션을 선택하세요.');
+                return;
+            }
+            
+            const sec = siteData.sections[editingSectionIndex];
+            if (!sec.items) sec.items = [];
+            
+            if (editingItemIndex === -1) {
+                sec.items.push(item);
+            } else {
+                sec.items[editingItemIndex] = item;
+            }
+            
+            editingItemIndex = -1;
+            document.getElementById('itemEditor').style.display = 'none';
+            renderSectionItems(sec.items);
+            updatePreview();
+        }
+        
+        function cancelItemEdit() {
+            editingItemIndex = -1;
+            document.getElementById('itemEditor').style.display = 'none';
+        }
+        
+        function saveSectionEdit() {
+            const title = document.getElementById('secTitleInput').value.trim();
+            if (!title) {
+                alert('섹션 제목은 필수입니다.');
+                return;
+            }
+            
+            if (!Array.isArray(siteData.sections)) {
+                siteData.sections = [];
+            }
+            
+            const sec = editingSectionIndex === -1 
+                ? { title, items: [] }
+                : siteData.sections[editingSectionIndex];
+            
+            sec.title = title;
+            if (!sec.items) sec.items = [];
+            
+            if (editingSectionIndex === -1) {
+                siteData.sections.push(sec);
+            }
+            
+            editingSectionIndex = -1;
+            document.getElementById('sectionEditor').style.display = 'none';
+            renderSectionsList();
+            updatePreview();
+        }
+        
+        function cancelSectionEdit() {
+            editingSectionIndex = -1;
+            editingItemIndex = -1;
+            document.getElementById('sectionEditor').style.display = 'none';
+            document.getElementById('itemEditor').style.display = 'none';
         }
         
         // 저장

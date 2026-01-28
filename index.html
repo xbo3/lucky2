@@ -410,6 +410,17 @@
             color: #38bdf8;
             text-decoration: none;
         }
+
+        /* 동적 섹션 */
+        .dynamic-section {
+            margin-bottom: 20px;
+        }
+
+        .dynamic-section-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -461,6 +472,9 @@
             <div class="events-title">🎯 이벤트</div>
             <div class="event-list" id="events-list"></div>
         </div>
+
+        <!-- 동적 섹션 (배너/버튼) -->
+        <div id="dynamic-sections"></div>
 
         <!-- 기프티콘 수령방법 -->
         <div class="info-section">
@@ -608,6 +622,45 @@
                 } else {
                     eventsSection.style.display = 'none';
                     eventsList.innerHTML = '';
+                }
+            }
+
+            // 동적 섹션 렌더링
+            const dynamicSectionsContainer = document.getElementById('dynamic-sections');
+            if (dynamicSectionsContainer) {
+                if (data.sections && Array.isArray(data.sections) && data.sections.length > 0) {
+                    dynamicSectionsContainer.innerHTML = data.sections.map(sec => {
+                        const itemsHtml = (sec.items || []).map(item => {
+                            if (item.type === 'banner') {
+                                const height = item.height || 200;
+                                const width = item.width || '100%';
+                                const imgTag = item.image 
+                                    ? `<img src="${item.image}" style="width:${width};height:${height}px;object-fit:cover;border-radius:12px;display:block;">`
+                                    : '<div style="width:100%;height:' + height + 'px;background:rgba(30,30,30,0.9);border-radius:12px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);">이미지 없음</div>';
+                                return item.link 
+                                    ? `<a href="${item.link}" target="_blank" rel="noopener noreferrer" style="display:block;margin-bottom:10px;">${imgTag}</a>`
+                                    : `<div style="margin-bottom:10px;">${imgTag}</div>`;
+                            } else {
+                                const height = item.height || 60;
+                                const width = item.width || '100%';
+                                const bgColor = item.bgColor || 'linear-gradient(135deg, #22c55e, #16a34a)';
+                                const textColor = item.textColor || '#fff';
+                                const fontSize = item.fontSize || 16;
+                                const btnStyle = `display:block;width:${width};height:${height}px;background:${bgColor};color:${textColor};text-align:center;line-height:${height}px;border-radius:12px;font-size:${fontSize}px;font-weight:700;text-decoration:none;margin-bottom:10px;transition:all 0.3s;`;
+                                return item.link
+                                    ? `<a href="${item.link}" target="_blank" rel="noopener noreferrer" style="${btnStyle}">${item.text || '버튼'}</a>`
+                                    : `<div style="${btnStyle}border:none;cursor:default;">${item.text || '버튼'}</div>`;
+                            }
+                        }).join('');
+                        return `
+                            <div class="dynamic-section" style="margin-bottom:20px;">
+                                ${sec.title ? `<div class="events-title">${sec.title}</div>` : ''}
+                                <div class="dynamic-section-items">${itemsHtml}</div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    dynamicSectionsContainer.innerHTML = '';
                 }
             }
         }
