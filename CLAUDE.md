@@ -16,7 +16,17 @@
    - refactor: 리팩토링
 
 ## 마지막 작업 (2026-01-29)
-- **BiPlay Admin 복구 및 배포 완료** (최신)
+- **VIP 호출 버튼 개선** (최신)
+  - VIP 버튼 우측 상단 고정 (fixed position)
+  - VIP 카드 애니메이션 추가
+    - 카드 수 선택: 1명 / 2명
+    - 애니메이션 타입: 좌↔우, 좌→우 순차, 우→좌 순차
+    - 2초 ease-in-out, translateX 수평 이동
+  - 어드민 설정 UI 추가
+  - 미리보기 테스트 기능
+  - 커밋: `5128561`
+
+- **BiPlay Admin 복구 및 배포 완료**
   - reflog에서 20f7da4 커밋 복구
   - Cursor가 만든 동적 섹션 관리 기능
   - BiPlay Admin 제대로 배포 완료
