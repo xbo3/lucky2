@@ -1,6 +1,36 @@
 # BiPlay 프로젝트
 
-## 마지막 작업 (2025-01-27)
+## 마지막 작업 (2026-01-29)
+- **BiPlay 어드민 대규모 개선 완료**
+  - 섹션별 독립적 간격 조절 (marginTop, marginBottom, paddingX)
+  - 모든 섹션에 버튼 추가 기능
+    - 투명도 조절 (0-100%)
+    - 색상 커스터마이징
+    - 링크 타입: URL / 텔레그램 / 내부링크
+  - 상세페이지 옵션 추가
+    - URL 연결
+    - 텍스트 콘텐츠
+    - 프라그마틱 슬롯 게임 연동
+  - 프라그마틱 무료 슬롯 iframe 모달 플레이어
+  - 하위호환성 유지 (migrateSection 함수)
+  - 커밋: `20f7da4`, `7c60b9c`
+
+- **Part2 백엔드 AI 자동 스크래핑 추가**
+  - AI 자동 셀렉터 추출 기능
+    - Playwright로 자동 로그인
+    - Claude API로 HTML 분석
+    - CSS 셀렉터 자동 추출 및 저장
+  - 10분마다 자동 스크래핑 스케줄러
+    - APScheduler 통합
+    - FastAPI lifespan 이벤트 활용
+  - 새 엔드포인트:
+    - `POST /api/sites/{site_id}/ai-analyze` - AI 분석 실행
+    - `GET /api/sites/{site_id}/selectors` - 셀렉터 조회
+    - `GET /api/scheduler/status` - 스케줄러 상태
+  - Railway 배포 설정 (railway.toml)
+  - 커밋: `fe3be29`, `309a41d`
+
+## 이전 작업 (2025-01-27)
 - 완전 리셋: 소사장 폴더 템플릿으로 단순화
 - 실시간 미리보기 기능 추가 (postMessage 방식)
 - 12가지 컬러 프리셋 버튼 + 커스텀 컬러 피커
@@ -26,11 +56,12 @@
   - 조절 중 실시간 크기 표시 (px)
 
 ## 현재 상태
-- 배포 완료: commit c5781ab
+- 배포 완료: commit 7c60b9c (2026-01-29)
 - Railway 자동 배포 중
 - 실시간 미리보기 작동 중
 - 드래그 앤 드롭 업로드 작동 중
-- 간격/크기 조절 작동 중
+- 섹션별 간격/버튼/상세페이지 조절 작동 중
+- 프라그마틱 슬롯 게임 연동 완료
 
 ## 다음에 할 것
 - 추가 UI/UX 개선 요청 대기
@@ -85,11 +116,11 @@ biplay-simple/
 - Storage: JSON 파일
 
 ## 최근 커밋
+- `7c60b9c` - feat: 동적 섹션 및 버튼 추가 (2026-01-29)
+- `20f7da4` - BiPlay 어드민 대규모 개선 작업 완료 (2026-01-29)
 - `c5781ab` - Add spacing controls and button size adjustments
 - `7b543a5` - Update CLAUDE.md with drag-and-drop feature
 - `fdfc671` - Add drag-and-drop upload and image support
-- `fe24fbf` - Add CLAUDE.md for session tracking
-- `fa16329` - Add color presets and section spacing controls
 
 ## 참고사항
 - 단일 사이트 전용 (멀티사이트 제거)
