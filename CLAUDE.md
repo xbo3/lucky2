@@ -1,5 +1,20 @@
 # BiPlay 프로젝트
 
+## 🤝 소사장과 Claude의 규칙
+1. **작업 완료 시 CLAUDE.md 업데이트 필수**
+   - 소사장 폴더: `C:\Users\woo\Desktop\★커서★\lucky2\CLAUDE.md`
+   - 작업한 레포: 각 프로젝트의 `CLAUDE.md`
+   - 내용: 날짜, 작업 내용, 커밋 해시, 기술 스택
+2. **배포 전 반드시 확인**
+   - 테스트 실행 여부
+   - 환경 변수 설정
+   - Railway/Vercel 배포 상태
+3. **커밋 메시지 규칙**
+   - feat: 새 기능
+   - fix: 버그 수정
+   - docs: 문서 업데이트
+   - refactor: 리팩토링
+
 ## 마지막 작업 (2026-01-29)
 - **BiPlay 어드민 대규모 개선 완료**
   - 섹션별 독립적 간격 조절 (marginTop, marginBottom, paddingX)
