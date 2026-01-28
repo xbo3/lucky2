@@ -49,7 +49,8 @@
     - `GET /api/sites/{site_id}/selectors` - 셀렉터 조회
     - `GET /api/scheduler/status` - 스케줄러 상태
   - Railway 배포 설정 (railway.toml)
-  - 커밋: `fe3be29`, `309a41d`
+  - Railway 크래시 수정 (lazy initialization)
+  - 커밋: `fe3be29`, `309a41d`, `4ea71c0`
 
 ## 이전 작업 (2025-01-27)
 - 완전 리셋: 소사장 폴더 템플릿으로 단순화
