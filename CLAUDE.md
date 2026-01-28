@@ -16,7 +16,13 @@
    - refactor: 리팩토링
 
 ## 마지막 작업 (2026-01-29)
-- **BiPlay 도메인 라우팅 수정** (최신)
+- **BiPlay Admin 복구 및 배포 완료** (최신)
+  - reflog에서 20f7da4 커밋 복구
+  - Cursor가 만든 동적 섹션 관리 기능
+  - BiPlay Admin 제대로 배포 완료
+  - 커밋: `532f520`
+
+- **BiPlay 도메인 라우팅 수정**
   - `biplay-production.up.railway.app` → admin.html (어드민)
   - `vip.luckyviky.eu` → index.html (미니앱)
   - luckyviky.store 제거 (다른 프로젝트)
