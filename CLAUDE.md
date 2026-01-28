@@ -16,7 +16,17 @@
    - refactor: 리팩토링
 
 ## 마지막 작업 (2026-01-29)
-- **도메인 자동 연결 기능** (최신)
+- **섹션 편집 및 슬롯 게임 개선** (최신)
+  - 선택된 섹션 → 초록색 테두리 표시
+  - 각 섹션 ON/OFF 토글 (👁️ 버튼)
+  - 섹션 클릭 → 해당 섹션 편집 함수 호출
+  - Pragmatic Play 슬롯 4개 데모 URL 추가
+    - Sweet Bonanza, Gates of Olympus, Starlight Princess, Big Bass Bonanza
+  - "곧 추가됩니다" 메시지 제거
+  - 편집 패널 fixed 위치로 변경
+  - 커밋: `3304143`
+
+- **도메인 자동 연결 기능**
   - 사이트 설정에 도메인 자동 연결 UI 추가
   - Part2 백엔드 API 연동 (Njalla DNS + Railway)
   - 도메인 입력 → 자동 연결 버튼 클릭 → 완료
