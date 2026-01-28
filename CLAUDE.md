@@ -44,13 +44,14 @@
   - 10분마다 자동 스크래핑 스케줄러
     - APScheduler 통합
     - FastAPI lifespan 이벤트 활용
+    - 환경변수로 제어 (ENABLE_SCHEDULER)
   - 새 엔드포인트:
     - `POST /api/sites/{site_id}/ai-analyze` - AI 분석 실행
     - `GET /api/sites/{site_id}/selectors` - 셀렉터 조회
     - `GET /api/scheduler/status` - 스케줄러 상태
   - Railway 배포 설정 (railway.toml)
-  - Railway 크래시 수정 (lazy initialization)
-  - 커밋: `fe3be29`, `309a41d`, `4ea71c0`
+  - Railway 크래시 수정 (lazy initialization + 선택적 스케줄러)
+  - 커밋: `fe3be29`, `309a41d`, `4ea71c0`, `48fc7bf`
 
 ## 이전 작업 (2025-01-27)
 - 완전 리셋: 소사장 폴더 템플릿으로 단순화
