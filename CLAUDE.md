@@ -16,11 +16,11 @@
    - refactor: 리팩토링
 
 ## 마지막 작업 (2026-01-29)
-- **도메인별 라우팅 수정** (최신)
-  - 커스텀 도메인 (luckyviky.store) → index.html (미니앱)
-  - Railway 도메인 (biplay-production.up.railway.app) → admin.html (어드민)
-  - `/admin.html` 명시적 접근 가능
-  - 커밋: `fa97045`
+- **BiPlay 도메인 라우팅 수정** (최신)
+  - `biplay-production.up.railway.app` → admin.html (어드민)
+  - `vip.luckyviky.eu` → index.html (미니앱)
+  - luckyviky.store 제거 (다른 프로젝트)
+  - 커밋: `ed67de6`
 
 - **BiPlay 어드민 대규모 개선 완료**
   - 섹션별 독립적 간격 조절 (marginTop, marginBottom, paddingX)
