@@ -273,13 +273,17 @@ app.post('/api/stats/reset', (req, res) => {
 app.get('/', (req, res) => {
     const host = req.get('host') || '';
 
-    // Railway 도메인 또는 명시적 어드민 요청 → admin.html
+    // Railway 도메인 (biplay-production.up.railway.app) → admin.html
     if (host.includes('railway.app') || host.includes('localhost')) {
         res.sendFile(path.join(__dirname, 'admin.html'));
     }
-    // 커스텀 도메인 (luckyviky.store 등) → index.html (미니앱)
-    else {
+    // vip.luckyviky.eu → index.html (미니앱)
+    else if (host.includes('vip.luckyviky.eu')) {
         res.sendFile(path.join(__dirname, 'index.html'));
+    }
+    // 기타 도메인 → 어드민 (기본값)
+    else {
+        res.sendFile(path.join(__dirname, 'admin.html'));
     }
 });
 
