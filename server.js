@@ -269,14 +269,23 @@ app.post('/api/stats/reset', (req, res) => {
     res.json({ success: true, message: '통계 리셋 완료' });
 });
 
-// 어드민 페이지
-app.get('/admin.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html'));
+// 도메인별 라우팅
+app.get('/', (req, res) => {
+    const host = req.get('host') || '';
+
+    // Railway 도메인 또는 명시적 어드민 요청 → admin.html
+    if (host.includes('railway.app') || host.includes('localhost')) {
+        res.sendFile(path.join(__dirname, 'admin.html'));
+    }
+    // 커스텀 도메인 (luckyviky.store 등) → index.html (미니앱)
+    else {
+        res.sendFile(path.join(__dirname, 'index.html'));
+    }
 });
 
-// 메인 페이지
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+// 어드민 페이지 명시적 접근
+app.get('/admin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
 // 서버 시작
