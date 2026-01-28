@@ -170,6 +170,21 @@
                 <button class="save-btn" onclick="saveSite()">💾 저장</button>
             </div>
             
+            <!-- 사이트 선택 -->
+            <div class="section" style="margin-top:0;">
+                <div class="section-title">🌐 사이트 선택 (도메인 기준)</div>
+                <label class="form-label">현재 편집 중인 도메인</label>
+                <select id="siteSelect" class="form-input" onchange="changeSite()">
+                    <!-- 서버에서 불러온 도메인 목록으로 채워짐 -->
+                </select>
+                <label class="form-label" style="margin-top:8px;">새 도메인 추가 (최대 10개)</label>
+                <div style="display:flex;gap:8px;">
+                    <input type="text" id="newDomainInput" class="form-input" placeholder="예: vip.luckyviky.eu">
+                    <button onclick="addDomain()" style="white-space:nowrap;background:rgba(34,197,94,0.2);border:none;color:#22c55e;padding:0 12px;border-radius:8px;cursor:pointer;font-size:12px;">추가</button>
+                </div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px;" id="siteLimitInfo"></div>
+            </div>
+            
             <!-- 📊 트래픽 통계 -->
             <div class="section" style="background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(22,163,74,0.1));">
                 <div class="section-title">📊 트래픽 통계</div>
@@ -242,6 +257,41 @@
                 <input type="text" class="form-input" id="eventBtnLink" placeholder="https://..." oninput="updatePreview()">
             </div>
             
+            <!-- 멀티 이벤트 리스트 -->
+            <div class="section">
+                <div class="section-title">🎯 개별 이벤트 관리</div>
+                <div id="eventsContainer"></div>
+                <button style="width:100%;margin-top:8px;background:rgba(34,197,94,0.2);border:none;color:#22c55e;padding:10px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;" onclick="startAddEvent()">＋ 이벤트 추가</button>
+                
+                <!-- 이벤트 편집 폼 -->
+                <div id="eventEditor" style="margin-top:12px;display:none;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;">
+                    <div style="font-size:13px;font-weight:700;margin-bottom:8px;" id="eventEditorTitle">이벤트 추가</div>
+                    
+                    <label class="form-label">배지 (예: BEST, NEW)</label>
+                    <input type="text" class="form-input" id="evBadgeInput" placeholder="BEST">
+
+                    <label class="form-label">아이콘/이모지 (예: 🎰)</label>
+                    <input type="text" class="form-input" id="evIconInput" placeholder="🎰">
+
+                    <label class="form-label">제목</label>
+                    <input type="text" class="form-input" id="evTitleInput" placeholder="MELBET">
+
+                    <label class="form-label">설명</label>
+                    <input type="text" class="form-input" id="evDescInput" placeholder="첫 입금 100% 보너스">
+
+                    <label class="form-label">배경 색상 (CSS 컬러값)</label>
+                    <input type="text" class="form-input" id="evBgInput" placeholder="linear-gradient(135deg,#22c55e,#16a34a)">
+
+                    <label class="form-label">링크 URL</label>
+                    <input type="text" class="form-input" id="evLinkInput" placeholder="https://...">
+
+                    <div style="display:flex;gap:8px;margin-top:4px;">
+                        <button onclick="saveEventEdit()" style="flex:1;background:#22c55e;border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;">저장</button>
+                        <button onclick="cancelEventEdit()" style="flex:1;background:rgba(255,255,255,0.08);border:none;color:#fff;padding:10px;border-radius:8px;cursor:pointer;font-size:13px;">취소</button>
+                    </div>
+                </div>
+            </div>
+            
             <!-- 혜택 카드 -->
             <div class="section">
                 <div class="section-title">💰 혜택 카드</div>
@@ -293,6 +343,9 @@
     </div>
     
     <script>
+        let currentDomain = 'default';
+        let siteIndex = { maxSites: 10, sites: [] };
+        let editingEventIndex = -1; // -1이면 새 이벤트
         let siteData = {
             logo: 'LUCKY <span>VIKY</span>',
             bgVideo: '',
@@ -312,19 +365,104 @@
             ctaBtnText: '🎉 3주년 기념 보너스 지금 참여하기',
             ctaBtnLink: 'https://KK-32.COM',
             contactLink: 'https://t.me/BIPLAYS',
-            contactText: '@BIPLAYS'
+            contactText: '@BIPLAYS',
+            events: []
         };
         
-        // 초기화
-        async function init() {
+        // ================== 사이트(도메인) 관리 ==================
+        async function loadSites() {
             try {
-                const response = await fetch('/api/site');
+                const res = await fetch('/api/sites');
+                siteIndex = await res.json();
+            } catch (e) {
+                // 서버에서 사이트 인덱스를 못 가져오면 기본값
+                siteIndex = {
+                    maxSites: 10,
+                    sites: [{ domain: 'vip.luckyviky.eu' }]
+                };
+            }
+
+            const select = document.getElementById('siteSelect');
+            select.innerHTML = '';
+            siteIndex.sites.forEach((s, idx) => {
+                const opt = document.createElement('option');
+                opt.value = s.domain;
+                opt.textContent = s.domain;
+                if (idx === 0 && !currentDomain) {
+                    currentDomain = s.domain;
+                }
+                select.appendChild(opt);
+            });
+
+            // currentDomain이 목록에 없으면 첫 번째로 맞추기
+            const exists = siteIndex.sites.some(s => s.domain === currentDomain);
+            if (!exists && siteIndex.sites.length > 0) {
+                currentDomain = siteIndex.sites[0].domain;
+            }
+            select.value = currentDomain;
+
+            const info = document.getElementById('siteLimitInfo');
+            info.textContent = `등록된 사이트: ${siteIndex.sites.length} / 최대 ${siteIndex.maxSites || 10}개`;
+        }
+
+        function changeSite() {
+            const select = document.getElementById('siteSelect');
+            currentDomain = select.value || 'default';
+            loadSiteDataForCurrentDomain();
+        }
+
+        async function addDomain() {
+            const input = document.getElementById('newDomainInput');
+            const domain = (input.value || '').trim();
+            if (!domain) return alert('도메인을 입력해주세요.');
+
+            if (siteIndex.sites.some(s => s.domain === domain)) {
+                alert('이미 등록된 도메인입니다.');
+                return;
+            }
+            if (siteIndex.sites.length >= (siteIndex.maxSites || 10)) {
+                alert('최대 10개 사이트까지 등록 가능합니다.');
+                return;
+            }
+
+            siteIndex.sites.push({ domain });
+            currentDomain = domain;
+            input.value = '';
+            // 셀렉트 박스 다시 구성
+            const select = document.getElementById('siteSelect');
+            const opt = document.createElement('option');
+            opt.value = domain;
+            opt.textContent = domain;
+            select.appendChild(opt);
+            select.value = domain;
+            document.getElementById('siteLimitInfo').textContent =
+                `등록된 사이트: ${siteIndex.sites.length} / 최대 ${siteIndex.maxSites || 10}개`;
+
+            // 새 도메인은 아직 서버에 파일이 없으므로 기본값으로 시작
+            siteData = { ...siteData };
+            loadDataToForm();
+        }
+
+        // 현재 선택된 도메인의 사이트 데이터 로드
+        async function loadSiteDataForCurrentDomain() {
+            try {
+                const response = await fetch(`/api/site?domain=${encodeURIComponent(currentDomain)}`);
                 const data = await response.json();
                 siteData = { ...siteData, ...data };
+                if (!Array.isArray(siteData.events)) {
+                    siteData.events = [];
+                }
                 loadDataToForm();
             } catch (error) {
-                console.log('기본 데이터 사용');
+                console.log('사이트 데이터 로드 실패, 기본 데이터 사용');
+                loadDataToForm();
             }
+        }
+
+        // 초기화
+        async function init() {
+            await loadSites();
+            await loadSiteDataForCurrentDomain();
         }
         
         // 폼에 데이터 로드
@@ -332,6 +470,7 @@
             document.getElementById('logo').value = siteData.logo || '';
             document.getElementById('bgVideo').value = siteData.bgVideo || '';
             document.getElementById('bgOverlay').value = siteData.bgOverlay || 0.6;
+            document.getElementById('bannerVideoUrl').value = siteData.bannerVideo || '';
             document.getElementById('eventBadge').value = siteData.eventBadge || '';
             document.getElementById('eventTitle').value = siteData.eventTitle || '';
             document.getElementById('eventTitleSize').value = siteData.eventTitleSize || 32;
@@ -350,12 +489,122 @@
             document.getElementById('ctaBtnLink').value = siteData.ctaBtnLink || '';
             document.getElementById('contactLink').value = siteData.contactLink || '';
             document.getElementById('contactText').value = siteData.contactText || '';
+            // 이벤트 리스트
+            if (!Array.isArray(siteData.events)) {
+                siteData.events = [];
+            }
+            renderEventsList();
             
-            if (siteData.bannerImage) {
-                document.getElementById('bannerImagePreview').innerHTML = 
-                    `<img src="${siteData.bannerImage}" class="img-preview">`;
+            if (siteData.bannerVideo) {
+                document.getElementById('bannerVideoPreview').innerHTML = 
+                    `<video src="${siteData.bannerVideo}" class="img-preview" autoplay muted loop playsinline></video>`;
             }
             
+            updatePreview();
+        }
+
+        // 멀티 이벤트 리스트 렌더링
+        function renderEventsList() {
+            const container = document.getElementById('eventsContainer');
+            if (!container) return;
+
+            if (!siteData.events || siteData.events.length === 0) {
+                container.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.5);">등록된 이벤트가 없습니다. ＋ 버튼을 눌러 추가하세요.</div>';
+                return;
+            }
+
+            container.innerHTML = siteData.events.map((ev, idx) => {
+                const badge = ev.badge ? `<div style="font-size:10px;font-weight:700;color:#fbbf24;margin-bottom:4px;">${ev.badge}</div>` : '';
+                const bg = ev.bgColor || 'rgba(15,23,42,0.8)';
+                const icon = ev.icon || '🎰';
+                const title = ev.title || '이벤트';
+                const desc = ev.description || '';
+                return `
+                    <div style="position:relative;background:${bg};border-radius:10px;padding:10px 36px 10px 10px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);">
+                        ${badge}
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <div style="font-size:18px;">${icon}</div>
+                            <div style="flex:1;">
+                                <div style="font-size:13px;font-weight:700;">${title}</div>
+                                <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;">${desc}</div>
+                            </div>
+                        </div>
+                        <div style="position:absolute;top:6px;right:6px;display:flex;gap:4px;">
+                            <button onclick="editEvent(${idx})" title="수정" style="background:rgba(15,23,42,0.9);border:none;color:#e5e7eb;width:22px;height:22px;border-radius:999px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">✏️</button>
+                            <button onclick="deleteEvent(${idx})" title="삭제" style="background:rgba(127,29,29,0.9);border:none;color:#fee2e2;width:22px;height:22px;border-radius:999px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function startAddEvent() {
+            editingEventIndex = -1;
+            document.getElementById('eventEditorTitle').textContent = '이벤트 추가';
+            document.getElementById('evBadgeInput').value = '';
+            document.getElementById('evIconInput').value = '';
+            document.getElementById('evTitleInput').value = '';
+            document.getElementById('evDescInput').value = '';
+            document.getElementById('evBgInput').value = '';
+            document.getElementById('evLinkInput').value = '';
+            document.getElementById('eventEditor').style.display = 'block';
+        }
+
+        function editEvent(index) {
+            if (!siteData.events || !siteData.events[index]) return;
+            const ev = siteData.events[index];
+            editingEventIndex = index;
+            document.getElementById('eventEditorTitle').textContent = '이벤트 수정';
+            document.getElementById('evBadgeInput').value = ev.badge || '';
+            document.getElementById('evIconInput').value = ev.icon || '';
+            document.getElementById('evTitleInput').value = ev.title || '';
+            document.getElementById('evDescInput').value = ev.description || '';
+            document.getElementById('evBgInput').value = ev.bgColor || '';
+            document.getElementById('evLinkInput').value = ev.link || '';
+            document.getElementById('eventEditor').style.display = 'block';
+        }
+
+        function deleteEvent(index) {
+            if (!siteData.events || !siteData.events[index]) return;
+            if (!confirm('이 이벤트를 삭제하시겠습니까?')) return;
+            siteData.events.splice(index, 1);
+            renderEventsList();
+            updatePreview();
+        }
+
+        function cancelEventEdit() {
+            editingEventIndex = -1;
+            document.getElementById('eventEditor').style.display = 'none';
+        }
+
+        function saveEventEdit() {
+            const ev = {
+                badge: document.getElementById('evBadgeInput').value.trim(),
+                icon: document.getElementById('evIconInput').value.trim(),
+                title: document.getElementById('evTitleInput').value.trim(),
+                description: document.getElementById('evDescInput').value.trim(),
+                bgColor: document.getElementById('evBgInput').value.trim(),
+                link: document.getElementById('evLinkInput').value.trim()
+            };
+
+            if (!ev.title) {
+                alert('제목은 필수입니다.');
+                return;
+            }
+
+            if (!Array.isArray(siteData.events)) {
+                siteData.events = [];
+            }
+
+            if (editingEventIndex === -1) {
+                siteData.events.push(ev);
+            } else {
+                siteData.events[editingEventIndex] = ev;
+            }
+
+            editingEventIndex = -1;
+            document.getElementById('eventEditor').style.display = 'none';
+            renderEventsList();
             updatePreview();
         }
         
@@ -364,6 +613,7 @@
             siteData.logo = document.getElementById('logo').value;
             siteData.bgVideo = document.getElementById('bgVideo').value;
             siteData.bgOverlay = parseFloat(document.getElementById('bgOverlay').value);
+            siteData.bannerVideo = document.getElementById('bannerVideoUrl').value || siteData.bannerVideo || '';
             siteData.eventBadge = document.getElementById('eventBadge').value;
             siteData.eventTitle = document.getElementById('eventTitle').value;
             siteData.eventTitleSize = parseInt(document.getElementById('eventTitleSize').value);
@@ -389,19 +639,30 @@
             }
         }
         
-        // 배너 이미지 업로드
-        function handleBannerImage(input) {
+        // 배너 동영상 업로드 (데이터 URL로 저장 - 소용량용)
+        function handleBannerVideo(input) {
             const file = input.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    siteData.bannerImage = e.target.result;
-                    document.getElementById('bannerImagePreview').innerHTML = 
-                        `<img src="${e.target.result}" class="img-preview">`;
+                    siteData.bannerVideo = e.target.result;
+                    document.getElementById('bannerVideoPreview').innerHTML = 
+                        `<video src="${e.target.result}" class="img-preview" autoplay muted loop playsinline></video>`;
                     updatePreview();
                 };
                 reader.readAsDataURL(file);
             }
+        }
+        
+        // 배너 동영상 URL 직접 입력
+        function updateBannerVideoUrl() {
+            const url = document.getElementById('bannerVideoUrl').value;
+            if (url) {
+                siteData.bannerVideo = url;
+                document.getElementById('bannerVideoPreview').innerHTML = 
+                    `<video src="${url}" class="img-preview" autoplay muted loop playsinline></video>`;
+            }
+            updatePreview();
         }
         
         // 저장
@@ -410,13 +671,17 @@
                 const response = await fetch('/api/site', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(siteData)
+                    body: JSON.stringify({
+                        domain: currentDomain,
+                        data: siteData
+                    })
                 });
-                
+
                 if (response.ok) {
                     alert('✅ 저장 완료!');
                 } else {
-                    alert('❌ 저장 실패');
+                    const err = await response.json().catch(() => null);
+                    alert('❌ 저장 실패: ' + (err && err.message ? err.message : '서버 오류'));
                 }
             } catch (error) {
                 alert('❌ 저장 실패: ' + error.message);

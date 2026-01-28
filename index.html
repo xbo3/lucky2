@@ -342,6 +342,74 @@
             color: #22c55e;
             text-decoration: none;
         }
+
+        /* 멀티 이벤트 섹션 */
+        .events-section {
+            margin-bottom: 10px;
+        }
+
+        .events-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .event-card-small {
+            position: relative;
+            border-radius: 12px;
+            padding: 12px;
+            background: rgba(15,23,42,0.9);
+            border: 1px solid rgba(148,163,184,0.4);
+        }
+
+        .event-badge-small {
+            font-size: 10px;
+            font-weight: 700;
+            color: #fbbf24;
+            margin-bottom: 4px;
+        }
+
+        .event-main-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .event-icon {
+            font-size: 20px;
+        }
+
+        .event-texts {
+            flex: 1;
+        }
+
+        .event-title-small {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .event-desc-small {
+            font-size: 11px;
+            color: rgba(226,232,240,0.8);
+            margin-top: 2px;
+        }
+
+        .event-link {
+            display: inline-block;
+            margin-top: 6px;
+            font-size: 11px;
+            color: #38bdf8;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -357,11 +425,14 @@
     <div class="particles" id="particles"></div>
     
     <div class="container">
-        <!-- 헤더 (동영상) -->
+        <!-- 헤더 (동영상 + 로고) -->
         <div class="header">
             <video class="header-video" id="header-video" autoplay muted loop playsinline>
                 <source src="banner.mp4" type="video/mp4">
             </video>
+            <!-- 어드민에서 제어하는 로고 영역 -->
+            <div class="logo" id="logo">LUCKY <span>VIKY</span></div>
+            <div class="subtitle">PREMIUM ONLINE CASINO</div>
         </div>
         
         <!-- 이벤트 카드 -->
@@ -383,6 +454,12 @@
                 <div class="benefit-item" id="benefit-2">기프티콘 50,000원</div>
             </div>
             <div class="benefit-note" id="benefit-note">* 슬롯 게임 전용 보너스</div>
+        </div>
+
+        <!-- 멀티 이벤트 섹션 -->
+        <div class="events-section" id="events-section" style="display:none;">
+            <div class="events-title">🎯 이벤트</div>
+            <div class="event-list" id="events-list"></div>
         </div>
 
         <!-- 기프티콘 수령방법 -->
@@ -430,10 +507,11 @@
             }
         }
         
-        // 사이트 데이터 로드
+        // 사이트 데이터 로드 (현재 도메인 기준)
         async function loadSiteData() {
             try {
-                const response = await fetch('/api/site');
+                const host = window.location.hostname || 'default';
+                const response = await fetch(`/api/site?domain=${encodeURIComponent(host)}`);
                 const data = await response.json();
                 renderSite(data);
             } catch (error) {
@@ -458,9 +536,15 @@
                 document.getElementById('logo').innerHTML = data.logo;
             }
             
-            // 배너 동영상
+            // 배너 동영상 (헤더 비디오로 사용)
             if (data.bannerVideo) {
-                document.getElementById('banner-video').src = data.bannerVideo;
+                const headerVideo = document.getElementById('header-video');
+                const source = headerVideo.querySelector('source') || headerVideo;
+                source.src = data.bannerVideo;
+                // <source>를 변경한 경우 비디오 리로드
+                if (source !== headerVideo) {
+                    headerVideo.load();
+                }
             }
             
             // 이벤트 카드
@@ -492,6 +576,39 @@
             if (data.contactLink) {
                 document.getElementById('contact-link').href = data.contactLink;
                 document.getElementById('contact-link').textContent = data.contactText || '@BIPLAYS';
+            }
+
+            // 멀티 이벤트 카드
+            const eventsSection = document.getElementById('events-section');
+            const eventsList = document.getElementById('events-list');
+            if (eventsSection && eventsList) {
+                if (data.events && Array.isArray(data.events) && data.events.length > 0) {
+                    eventsSection.style.display = 'block';
+                    eventsList.innerHTML = data.events.map(ev => {
+                        const bg = ev.bgColor || 'rgba(15,23,42,0.9)';
+                        const badge = ev.badge ? `<div class="event-badge-small">${ev.badge}</div>` : '';
+                        const icon = ev.icon || '🎰';
+                        const title = ev.title || '이벤트';
+                        const desc = ev.description || '';
+                        const link = ev.link ? `<a class="event-link" href="${ev.link}" target="_blank" rel="noopener noreferrer">자세히 보기 ➜</a>` : '';
+                        return `
+                            <div class="event-card-small" style="background:${bg};">
+                                ${badge}
+                                <div class="event-main-row">
+                                    <div class="event-icon">${icon}</div>
+                                    <div class="event-texts">
+                                        <div class="event-title-small">${title}</div>
+                                        <div class="event-desc-small">${desc}</div>
+                                        ${link}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    eventsSection.style.display = 'none';
+                    eventsList.innerHTML = '';
+                }
             }
         }
         
